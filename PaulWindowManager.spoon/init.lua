@@ -121,7 +121,7 @@ function screenDimensionFigurer.move(self)
     offsets.bottom = 0.5 * self.margin
   end
 
-print(string.format("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x, self.size.y, self.size.w, self.size.h))
+  print(string.format("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x, self.size.y, self.size.w, self.size.h))
 
   self.frame.x = (self.max.w * self.size.x / 100) + offsets.left
   self.frame.w = (self.max.w * self.size.w / 100) - offsets.left - offsets.right
@@ -130,17 +130,21 @@ print(string.format("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x,
 
   self.win:setFrame(self.frame)
 end
-function screenDimensionFigurer:bindSize(mash, key, size)
-  hs.hotkey.bind(mash, key, function()
-    local sdf = self:new(hs.window.focusedWindow())
 
-    sdf.size.h = size.h or 100
-    sdf.size.w = size.w or 100
-    sdf.size.x = size.x or 0
-    sdf.size.y = size.y or 0
+function screenDimensionFigurer:bindSizes(mappings)
+  for _, mapping in pairs(mappings) do
+    print(string.format("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w))
+    hs.hotkey.bind(mapping.mash, mapping.key, function()
+      local sdf = self:new(hs.window.focusedWindow())
 
-    sdf:move()
-  end)
+      sdf.size.h = mapping.size.h or 100
+      sdf.size.w = mapping.size.w or 100
+      sdf.size.x = mapping.size.x or 0
+      sdf.size.y = mapping.size.y or 0
+
+      sdf:move()
+    end)
+  end
 end
 
 return screenDimensionFigurer
