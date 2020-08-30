@@ -147,4 +147,15 @@ function screenDimensionFigurer:bindSizes(mappings)
   end
 end
 
+function screenDimensionFigurer:bindChangeSizes(mappings)
+  for _, mapping in pairs(mappings) do
+    print(string.format("the mapping is mash: %s, key: %s", mapping.mash, mapping.key))
+    hs.hotkey.bind(mapping.mash, mapping.key, function()
+      local sdf = self:new(hs.window.focusedWindow(), true)
+      sdf:changeSize(mapping.hw, mapping.delta)
+      sdf:move()
+    end)
+  end
+end
+
 return screenDimensionFigurer
