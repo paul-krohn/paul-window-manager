@@ -3,7 +3,7 @@ screenDimensionFigurer.__index = screenDimensionFigurer
 
 -- Metadata
 screenDimensionFigurer.name = "PaulWindowsManager"
-screenDimensionFigurer.version = "0.1"
+screenDimensionFigurer.version = "0.2"
 screenDimensionFigurer.author = "Paul Krohn <pkrohn@daemonize.com>"
 -- obj.homepage = "https://github.com/miromannino/miro-windows-management"
 screenDimensionFigurer.license = "MIT - https://opensource.org/licenses/MIT"
@@ -131,8 +131,9 @@ function screenDimensionFigurer.move(self)
   self.win:setFrame(self.frame)
 end
 
-function screenDimensionFigurer:bindSizes(mappings)
-  for _, mapping in pairs(mappings) do
+function screenDimensionFigurer:bindKeys(sizes, deltas, stack)
+
+  for _, mapping in pairs(sizes) do
     print(string.format("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w))
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local sdf = self:new(hs.window.focusedWindow())
@@ -145,16 +146,33 @@ function screenDimensionFigurer:bindSizes(mappings)
       sdf:move()
     end)
   end
-end
-
-function screenDimensionFigurer:bindChangeSizes(mappings)
-  for _, mapping in pairs(mappings) do
+  for _, mapping in pairs(deltas) do
     print(string.format("the mapping is mash: %s, key: %s", mapping.mash, mapping.key))
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local sdf = self:new(hs.window.focusedWindow(), true)
       sdf:changeSize(mapping.hw, mapping.delta)
       sdf:move()
     end)
+  end
+
+  for _, mapping in pairs(stack) do
+    print("mapping stacker")
+    print("the mash is ", mapping.mash)
+    hs.hotkey.bind(mapping.mash, mapping.key, function()
+      local win = hs.window.focusedWindow()
+      stackWindows(win)
+    end)
+  end
+end
+
+function stackWindows(win)
+  -- find all windows in the app of the frontmost window
+  -- make all the windows in the app the same size
+  local f = win:frame()
+  local app = win:application()
+  local windows = app:allWindows()
+  for i, window in ipairs(windows) do
+    window:setFrame(f)
   end
 end
 
