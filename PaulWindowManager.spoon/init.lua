@@ -131,7 +131,7 @@ function screenDimensionFigurer.move(self)
   self.win:setFrame(self.frame)
 end
 
-function screenDimensionFigurer:bindKeys(sizes, deltas, stack)
+function screenDimensionFigurer:bindKeys(sizes, deltas, stack, appDefaults)
 
   for _, mapping in pairs(sizes) do
     print(string.format("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w))
@@ -163,7 +163,36 @@ function screenDimensionFigurer:bindKeys(sizes, deltas, stack)
       stackWindows(win)
     end)
   end
+  if appDefaults.appDefaults and appDefaults.appDefaults.positions and appDefaults.appDefaults.mash and appDefaults.appDefaults.key then
+    hs.hotkey.bind(appDefaults.appDefaults.mash, appDefaults.appDefaults.key, appDefaultPositions(appDefaults.appDefaults.positions))
+  end
 end
+
+
+function appDefaultPositions(appPositions)
+  function theCallback()
+    for appName, position in pairs(appPositions) do
+      thisApp = hs.application.get(appName)
+      if thisApp == nil then
+        print("skipping nil app: ", appName)
+      else
+        for title, appWindow in pairs(thisApp:allWindows()) do
+          local sdf = screenDimensionFigurer:new(appWindow)
+
+          sdf.size.h = position.h or 100
+          sdf.size.w = position.w or 100
+          sdf.size.x = position.x or 0
+          sdf.size.y = position.y or 0
+
+          sdf:move()
+
+        end
+      end
+    end
+  end
+  return theCallback
+end
+
 
 function stackWindows(win)
   -- find all windows in the app of the frontmost window
