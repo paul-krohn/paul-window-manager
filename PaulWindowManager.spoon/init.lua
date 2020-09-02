@@ -50,7 +50,7 @@ function screenDimensionFigurer:guessSize()
     b = self.frame.y + self.frame.h >= self.max.h - self.margin
   }
 
-  -- print(string.format("abutments: l: %s r: %s, t: %s, b: %s", abuts.l, abuts.r, abuts.t, abuts.b))
+  self.log.df("abutments: l: %s r: %s, t: %s, b: %s", abuts.l, abuts.r, abuts.t, abuts.b)
 
   if abuts.l and abuts.r then
     self.size.x = 0
