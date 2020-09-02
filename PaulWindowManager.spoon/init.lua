@@ -8,6 +8,8 @@ screenDimensionFigurer.author = "Paul Krohn <pkrohn@daemonize.com>"
 -- obj.homepage = "https://github.com/miromannino/miro-windows-management"
 screenDimensionFigurer.license = "MIT - https://opensource.org/licenses/MIT"
 
+screenDimensionFigurer.log = hs.logger.new('sdf', 'debug')
+
 function screenDimensionFigurer:init()
   print("Initializing Paul's Windows Manager")
 end
@@ -27,7 +29,7 @@ function screenDimensionFigurer:new(win, useCurrentSize)
   self.menuBarOffset = win:screen():frame().y
 
   useCurrentSize = useCurrentSize or false
-  print(string.format("use current size: %s", useCurrentSize))
+  self.log.df("use current size: %s", useCurrentSize)
   if useCurrentSize then
    self:guessSize()
   end
@@ -39,7 +41,7 @@ end
 
 function screenDimensionFigurer:guessSize()
 
-  -- print(string.format("the frame we are guessing from: x: %s w: %s y: %s h: %s", self.frame.x, self.frame.w, self.frame.y, self.frame.h))
+  self.log.df("the frame we are guessing from: x: %s w: %s y: %s h: %s", self.frame.x, self.frame.w, self.frame.y, self.frame.h)
 
   local abuts = {
     l = self.frame.x <= self.margin,
@@ -78,7 +80,7 @@ function screenDimensionFigurer:guessSize()
     self.size.h = (self.frame.h + self.margin) / self.max.h * 100
   end
 
-  print(string.format("we guessed/calculated: x: %s w: %s y: %s h: %s", self.size.x, self.size.w, self.size.y, self.size.h))
+  self.log.df("we guessed/calculated: x: %s w: %s y: %s h: %s", self.size.x, self.size.w, self.size.y, self.size.h)
 end
 
 function screenDimensionFigurer:changeSize(hw, delta)
@@ -98,7 +100,7 @@ function screenDimensionFigurer:changeSize(hw, delta)
     self.size[xy] = 0
     self.size[hw] = 100
   end
-  print(string.format("%s: %s requested %s percent: %s, overage: %s", xy, self.size[xy], hw, requestedSideLength, overage))
+  self.log.df("%s: %s requested %s percent: %s, overage: %s", xy, self.size[xy], hw, requestedSideLength, overage)
 
 end
 
@@ -139,7 +141,7 @@ function screenDimensionFigurer:bindKeys(args)
   local next = args.next or {}
 
   for _, mapping in pairs(sizes) do
-    print(string.format("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w))
+    self.log.df("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local sdf = self:new(hs.window.focusedWindow())
 
@@ -152,7 +154,7 @@ function screenDimensionFigurer:bindKeys(args)
     end)
   end
   for _, mapping in pairs(deltas) do
-    print(string.format("the mapping is mash: %s, key: %s", mapping.mash, mapping.key))
+    self.logl.df("the mapping is mash: %s, key: %s", mapping.mash, mapping.key)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local sdf = self:new(hs.window.focusedWindow(), true)
       sdf:changeSize(mapping.hw, mapping.delta)
@@ -161,8 +163,7 @@ function screenDimensionFigurer:bindKeys(args)
   end
 
   for _, mapping in pairs(stack) do
-    print("mapping stacker")
-    print("the mash is ", mapping.mash)
+    self.log.df("mapping stacker, the mash is ", mapping.mash)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local win = hs.window.focusedWindow()
       stackWindows(win)
