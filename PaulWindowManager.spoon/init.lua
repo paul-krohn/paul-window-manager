@@ -170,7 +170,7 @@ function screenDimensionFigurer:bindKeys(args)
     end)
   end
   if appDefaults and appDefaults.positions and appDefaults.mash and appDefaults.key then
-    hs.hotkey.bind(appDefaults.mash, appDefaults.key, appDefaultPositions(appDefaults.positions))
+    hs.hotkey.bind(appDefaults.mash, appDefaults.key, self:appDefaultPositions(appDefaults.positions))
   end
 
   print("'next' mapping: ", next)
@@ -181,12 +181,12 @@ function screenDimensionFigurer:bindKeys(args)
 end
 
 
-function appDefaultPositions(appPositions)
+function screenDimensionFigurer:appDefaultPositions(appPositions)
   function theCallback()
     for appName, position in pairs(appPositions) do
       thisApp = hs.application.get(appName)
       if thisApp == nil then
-        print("skipping nil app: ", appName)
+        self.log.df("skipping nil app: %s", appName)
       else
         for title, appWindow in pairs(thisApp:allWindows()) do
           local sdf = screenDimensionFigurer:new(appWindow)
@@ -225,7 +225,6 @@ function moveWindowtoNextScreen()
     local scr = win:screen()
     local nextScreen = scr:next()
     win:moveToScreen(scr:next())
-    -- if nextScreen:fullFrame().h * nextScreen:fullFrame().w < scr:fullFrame().h * scr:fullFrame().w then
     if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
       -- next screen is smaller; make it full screen.
       local sdf = screenDimensionFigurer:new(win)
