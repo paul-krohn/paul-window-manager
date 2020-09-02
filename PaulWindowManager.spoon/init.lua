@@ -123,7 +123,7 @@ function screenDimensionFigurer.move(self)
     offsets.bottom = 0.5 * self.margin
   end
 
-  print(string.format("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x, self.size.y, self.size.w, self.size.h))
+  self.log.df("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x, self.size.y, self.size.w, self.size.h)
 
   self.frame.x = (self.max.w * self.size.x / 100) + offsets.left
   self.frame.w = (self.max.w * self.size.w / 100) - offsets.left - offsets.right
@@ -166,7 +166,7 @@ function screenDimensionFigurer:bindKeys(args)
     self.log.df("mapping stacker, the mash is ", mapping.mash)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local win = hs.window.focusedWindow()
-      stackWindows(win)
+      self:stackWindows(win)
     end)
   end
   if appDefaults and appDefaults.positions and appDefaults.mash and appDefaults.key then
@@ -176,10 +176,9 @@ function screenDimensionFigurer:bindKeys(args)
   print("'next' mapping: ", next)
   for _, mapping in pairs(next) do
     print("whee this is a mapping for next screen: ", mapping.mash, mapping.key)
-    hs.hotkey.bind(mapping.mash, mapping.key, moveWindowtoNextScreen())
+    hs.hotkey.bind(mapping.mash, mapping.key, self:moveWindowtoNextScreen())
   end
 end
-
 
 function screenDimensionFigurer:appDefaultPositions(appPositions)
   function theCallback()
@@ -205,8 +204,7 @@ function screenDimensionFigurer:appDefaultPositions(appPositions)
   return theCallback
 end
 
-
-function stackWindows(win)
+function screenDimensionFigurer:stackWindows(win)
   -- find all windows in the app of the frontmost window
   -- make all the windows in the app the same size
   local f = win:frame()
@@ -217,10 +215,10 @@ function stackWindows(win)
   end
 end
 
-function moveWindowtoNextScreen()
-  print("creating a function for moving a window to the next screen")
+function screenDimensionFigurer:moveWindowtoNextScreen()
+  self.log.vf("creating a function for moving a window to the next screen")
   return function()
-    print("moving a window to the next screen")
+    self.log.df("moving a window to the next screen")
     local win = hs.window.focusedWindow()
     local scr = win:screen()
     local nextScreen = scr:next()
