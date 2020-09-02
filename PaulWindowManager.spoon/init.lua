@@ -154,7 +154,7 @@ function screenDimensionFigurer:bindKeys(args)
     end)
   end
   for _, mapping in pairs(deltas) do
-    self.logl.df("the mapping is mash: %s, key: %s", mapping.mash, mapping.key)
+    self.log.df("the mapping is mash: %s, key: %s", mapping.mash, mapping.key)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
       local sdf = self:new(hs.window.focusedWindow(), true)
       sdf:changeSize(mapping.hw, mapping.delta)
