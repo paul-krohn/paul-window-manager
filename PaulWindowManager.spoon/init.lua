@@ -84,7 +84,7 @@ function screenDimensionFigurer:guessSize()
 end
 
 function screenDimensionFigurer:changeSize(hw, delta)
-  -- self:guessSize()
+
   xy = 'x'
   if  hw == 'h' then
     xy = 'y'
@@ -139,6 +139,7 @@ function screenDimensionFigurer:bindKeys(args)
   local stack = args.stack or {}
   local appDefaults = args.appDefaults or {}
   local next = args.next or {}
+  local mic = args.mic or {}
 
   for _, mapping in pairs(sizes) do
     self.log.df("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w)
@@ -173,10 +174,13 @@ function screenDimensionFigurer:bindKeys(args)
     hs.hotkey.bind(appDefaults.mash, appDefaults.key, self:appDefaultPositions(appDefaults.positions))
   end
 
-  print("'next' mapping: ", next)
   for _, mapping in pairs(next) do
-    print("whee this is a mapping for next screen: ", mapping.mash, mapping.key)
     hs.hotkey.bind(mapping.mash, mapping.key, self:moveWindowtoNextScreen())
+  end
+
+  for _, mapping in pairs(mic) do
+    self.log.df("mapping %s + %s to mic toggle", table.concat(mapping.mash, "+"), mapping.key)
+    hs.hotkey.bind(mapping.mash, mapping.key, self:micMuteToggle(mapping.mic))
   end
 end
 
@@ -231,4 +235,19 @@ function screenDimensionFigurer:moveWindowtoNextScreen()
     end
   end
 end
+
+function screenDimensionFigurer:micMuteToggle(micName)
+  return function()
+    local currentMic = hs.audiodevice.defaultInputDevice()
+    if micName then
+      currentMic = hs.audiodevice.findDeviceByName(micName)
+    end
+
+    currentMic:setMuted(not currentMic:muted())
+    local verb = currentMic:muted() and " " or " un-"
+    hs.alert.show(currentMic:name() .. verb .. "muted")
+
+  end
+end
+
 return screenDimensionFigurer
