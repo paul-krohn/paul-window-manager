@@ -8,7 +8,7 @@ PaulWindowManager.author = "Paul Krohn <pkrohn@daemonize.com>"
 -- obj.homepage = "https://github.com/paul-krohn/paul-window-manager"
 PaulWindowManager.license = "MIT - https://opensource.org/licenses/MIT"
 
-PaulWindowManager.log = hs.logger.new('sdf', 'debug')
+PaulWindowManager.log = hs.logger.new('pwm', 'debug')
 
 function PaulWindowManager:init()
   print("Initializing Paul's Window Manager")
@@ -144,22 +144,22 @@ function PaulWindowManager:bindKeys(args)
   for _, mapping in pairs(sizes) do
     self.log.df("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
-      local sdf = self:new(hs.window.focusedWindow())
+      local pwm = self:new(hs.window.focusedWindow())
 
-      sdf.size.h = mapping.size.h or 100
-      sdf.size.w = mapping.size.w or 100
-      sdf.size.x = mapping.size.x or 0
-      sdf.size.y = mapping.size.y or 0
+      pwm.size.h = mapping.size.h or 100
+      pwm.size.w = mapping.size.w or 100
+      pwm.size.x = mapping.size.x or 0
+      pwm.size.y = mapping.size.y or 0
 
-      sdf:move()
+      pwm:move()
     end)
   end
   for _, mapping in pairs(deltas) do
     self.log.df("the mapping is mash: %s, key: %s", mapping.mash, mapping.key)
     hs.hotkey.bind(mapping.mash, mapping.key, function()
-      local sdf = self:new(hs.window.focusedWindow(), true)
-      sdf:changeSize(mapping.hw, mapping.delta)
-      sdf:move()
+      local pwm = self:new(hs.window.focusedWindow(), true)
+      pwm:changeSize(mapping.hw, mapping.delta)
+      pwm:move()
     end)
   end
 
@@ -192,14 +192,14 @@ function PaulWindowManager:appDefaultPositions(appPositions)
         self.log.df("skipping nil app: %s", appName)
       else
         for title, appWindow in pairs(thisApp:allWindows()) do
-          local sdf = PaulWindowManager:new(appWindow)
+          local pwm = PaulWindowManager:new(appWindow)
 
-          sdf.size.h = position.h or 100
-          sdf.size.w = position.w or 100
-          sdf.size.x = position.x or 0
-          sdf.size.y = position.y or 0
+          pwm.size.h = position.h or 100
+          pwm.size.w = position.w or 100
+          pwm.size.x = position.x or 0
+          pwm.size.y = position.y or 0
 
-          sdf:move()
+          pwm:move()
 
         end
       end
@@ -229,9 +229,9 @@ function PaulWindowManager:moveWindowtoNextScreen()
     win:moveToScreen(scr:next())
     if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
       -- next screen is smaller; make it full screen.
-      local sdf = PaulWindowManager:new(win)
-      sdf.size = { h = 100, w = 100, x = 0, y = 0 }
-      sdf:move()
+      local pwm = PaulWindowManager:new(win)
+      pwm.size = { h = 100, w = 100, x = 0, y = 0 }
+      pwm:move()
     end
   end
 end
