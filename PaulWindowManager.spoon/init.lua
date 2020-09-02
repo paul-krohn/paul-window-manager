@@ -1,22 +1,22 @@
-screenDimensionFigurer = {}
-screenDimensionFigurer.__index = screenDimensionFigurer
+PaulWindowManager = {}
+PaulWindowManager.__index = PaulWindowManager
 
 -- Metadata
-screenDimensionFigurer.name = "PaulWindowsManager"
-screenDimensionFigurer.version = "0.2"
-screenDimensionFigurer.author = "Paul Krohn <pkrohn@daemonize.com>"
--- obj.homepage = "https://github.com/miromannino/miro-windows-management"
-screenDimensionFigurer.license = "MIT - https://opensource.org/licenses/MIT"
+PaulWindowManager.name = "PaulWindowManager"
+PaulWindowManager.version = "0.2"
+PaulWindowManager.author = "Paul Krohn <pkrohn@daemonize.com>"
+-- obj.homepage = "https://github.com/paul-krohn/paul-window-manager"
+PaulWindowManager.license = "MIT - https://opensource.org/licenses/MIT"
 
-screenDimensionFigurer.log = hs.logger.new('sdf', 'debug')
+PaulWindowManager.log = hs.logger.new('sdf', 'debug')
 
-function screenDimensionFigurer:init()
-  print("Initializing Paul's Windows Manager")
+function PaulWindowManager:init()
+  print("Initializing Paul's Window Manager")
 end
 
 
-function screenDimensionFigurer:new(win, useCurrentSize)
-  local self = setmetatable({}, screenDimensionFigurer)
+function PaulWindowManager:new(win, useCurrentSize)
+  local self = setmetatable({}, PaulWindowManager)
 
   self.size = {x = 0, y = 0, h = 100, w = 100}
 
@@ -39,7 +39,7 @@ function screenDimensionFigurer:new(win, useCurrentSize)
 end
 
 
-function screenDimensionFigurer:guessSize()
+function PaulWindowManager:guessSize()
 
   self.log.df("the frame we are guessing from: x: %s w: %s y: %s h: %s", self.frame.x, self.frame.w, self.frame.y, self.frame.h)
 
@@ -83,7 +83,7 @@ function screenDimensionFigurer:guessSize()
   self.log.df("we guessed/calculated: x: %s w: %s y: %s h: %s", self.size.x, self.size.w, self.size.y, self.size.h)
 end
 
-function screenDimensionFigurer:changeSize(hw, delta)
+function PaulWindowManager:changeSize(hw, delta)
 
   xy = 'x'
   if  hw == 'h' then
@@ -104,7 +104,7 @@ function screenDimensionFigurer:changeSize(hw, delta)
 
 end
 
-function screenDimensionFigurer.move(self)
+function PaulWindowManager.move(self)
 
   local offsets = {left = self.margin, right = self.margin, top = self.margin, bottom = self.margin}
   if self.size.x ~= 0 then
@@ -133,7 +133,7 @@ function screenDimensionFigurer.move(self)
   self.win:setFrame(self.frame)
 end
 
-function screenDimensionFigurer:bindKeys(args)
+function PaulWindowManager:bindKeys(args)
   local sizes = args.sizes or {}
   local deltas = args.deltas or {}
   local stack = args.stack or {}
@@ -184,7 +184,7 @@ function screenDimensionFigurer:bindKeys(args)
   end
 end
 
-function screenDimensionFigurer:appDefaultPositions(appPositions)
+function PaulWindowManager:appDefaultPositions(appPositions)
   function theCallback()
     for appName, position in pairs(appPositions) do
       thisApp = hs.application.get(appName)
@@ -192,7 +192,7 @@ function screenDimensionFigurer:appDefaultPositions(appPositions)
         self.log.df("skipping nil app: %s", appName)
       else
         for title, appWindow in pairs(thisApp:allWindows()) do
-          local sdf = screenDimensionFigurer:new(appWindow)
+          local sdf = PaulWindowManager:new(appWindow)
 
           sdf.size.h = position.h or 100
           sdf.size.w = position.w or 100
@@ -208,7 +208,7 @@ function screenDimensionFigurer:appDefaultPositions(appPositions)
   return theCallback
 end
 
-function screenDimensionFigurer:stackWindows(win)
+function PaulWindowManager:stackWindows(win)
   -- find all windows in the app of the frontmost window
   -- make all the windows in the app the same size
   local f = win:frame()
@@ -219,7 +219,7 @@ function screenDimensionFigurer:stackWindows(win)
   end
 end
 
-function screenDimensionFigurer:moveWindowtoNextScreen()
+function PaulWindowManager:moveWindowtoNextScreen()
   self.log.vf("creating a function for moving a window to the next screen")
   return function()
     self.log.df("moving a window to the next screen")
@@ -229,14 +229,14 @@ function screenDimensionFigurer:moveWindowtoNextScreen()
     win:moveToScreen(scr:next())
     if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
       -- next screen is smaller; make it full screen.
-      local sdf = screenDimensionFigurer:new(win)
+      local sdf = PaulWindowManager:new(win)
       sdf.size = { h = 100, w = 100, x = 0, y = 0 }
       sdf:move()
     end
   end
 end
 
-function screenDimensionFigurer:micMuteToggle(micName)
+function PaulWindowManager:micMuteToggle(micName)
   return function()
     local currentMic = hs.audiodevice.defaultInputDevice()
     if micName then
@@ -250,4 +250,4 @@ function screenDimensionFigurer:micMuteToggle(micName)
   end
 end
 
-return screenDimensionFigurer
+return PaulWindowManager
