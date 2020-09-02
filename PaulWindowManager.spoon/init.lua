@@ -131,7 +131,12 @@ function screenDimensionFigurer.move(self)
   self.win:setFrame(self.frame)
 end
 
-function screenDimensionFigurer:bindKeys(sizes, deltas, stack, appDefaults)
+function screenDimensionFigurer:bindKeys(args)
+  local sizes = args.sizes or {}
+  local deltas = args.deltas or {}
+  local stack = args.stack or {}
+  local appDefaults = args.appDefaults or {}
+  local next = args.next or {}
 
   for _, mapping in pairs(sizes) do
     print(string.format("the mapping is mash: %s, key: %s, size: %s", mapping.mash, mapping.key, mapping.size.w))
@@ -163,8 +168,14 @@ function screenDimensionFigurer:bindKeys(sizes, deltas, stack, appDefaults)
       stackWindows(win)
     end)
   end
-  if appDefaults.appDefaults and appDefaults.appDefaults.positions and appDefaults.appDefaults.mash and appDefaults.appDefaults.key then
-    hs.hotkey.bind(appDefaults.appDefaults.mash, appDefaults.appDefaults.key, appDefaultPositions(appDefaults.appDefaults.positions))
+  if appDefaults and appDefaults.positions and appDefaults.mash and appDefaults.key then
+    hs.hotkey.bind(appDefaults.mash, appDefaults.key, appDefaultPositions(appDefaults.positions))
+  end
+
+  print("'next' mapping: ", next)
+  for _, mapping in pairs(next) do
+    print("whee this is a mapping for next screen: ", mapping.mash, mapping.key)
+    hs.hotkey.bind(mapping.mash, mapping.key, moveWindowtoNextScreen())
   end
 end
 
@@ -205,4 +216,21 @@ function stackWindows(win)
   end
 end
 
+function moveWindowtoNextScreen()
+  print("creating a function for moving a window to the next screen")
+  return function()
+    print("moving a window to the next screen")
+    local win = hs.window.focusedWindow()
+    local scr = win:screen()
+    local nextScreen = scr:next()
+    win:moveToScreen(scr:next())
+    -- if nextScreen:fullFrame().h * nextScreen:fullFrame().w < scr:fullFrame().h * scr:fullFrame().w then
+    if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
+      -- next screen is smaller; make it full screen.
+      local sdf = screenDimensionFigurer:new(win)
+      sdf.size = { h = 100, w = 100, x = 0, y = 0 }
+      sdf:move()
+    end
+  end
+end
 return screenDimensionFigurer
