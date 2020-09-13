@@ -15,7 +15,7 @@ function PaulWindowManager:init()
 end
 
 
-function PaulWindowManager:new(win, useCurrentSize)
+function PaulWindowManager:new(win, useCurrentSize, screen)
   local self = setmetatable({}, PaulWindowManager)
 
   self.size = {x = 0, y = 0, h = 100, w = 100}
@@ -24,7 +24,7 @@ function PaulWindowManager:new(win, useCurrentSize)
 
   self.win = win
   self.frame = win:frame()
-  local screen = win:screen()
+  local screen = screen or win:screen()
   self.max = screen:frame()
   self.menuBarOffset = win:screen():frame().y
 
@@ -104,10 +104,14 @@ function PaulWindowManager:changeSize(hw, delta)
 
 end
 
-function PaulWindowManager.move(self)
+function PaulWindowManager:move()
+
+  self.log.d(string.format("window %s is going on screen %s", self.win:id(), self.win:screen():name()))
+  self.log.d(string.format("screen max -- x: %s y: %s h: %s w: %s", self.max.x, self.max.y, self.max.h, self.max.w))
 
   local offsets = {left = self.margin, right = self.margin, top = self.margin, bottom = self.margin}
-  if self.size.x ~= 0 then
+
+  if self.size.x >= 1 then
     offsets.left = 0.5 * self.margin
   end
 
@@ -115,7 +119,7 @@ function PaulWindowManager.move(self)
     offsets.right = 0.5 * self.margin
   end
 
-  if self.size.y ~= 0 then
+  if self.size.y >= 1 then
     offsets.top = 0.5 * self.margin
   end
 
@@ -124,10 +128,11 @@ function PaulWindowManager.move(self)
   end
 
   self.log.df("moving to size: (%%) x: %s y: %s w: %s h: %s", self.size.x, self.size.y, self.size.w, self.size.h)
+  self.log.df("margin offsets are: left: %s right: %s top: %s bottom: %s", offsets.left, offsets.right, offsets.top, offsets.bottom)
 
-  self.frame.x = (self.max.w * self.size.x / 100) + offsets.left
+  self.frame.x = self.max.x + (self.max.w * self.size.x / 100) + offsets.left
   self.frame.w = (self.max.w * self.size.w / 100) - offsets.left - offsets.right
-  self.frame.y = (self.max.h * self.size.y / 100) + offsets.top + self.menuBarOffset
+  self.frame.y = self.max.y + (self.max.h * self.size.y / 100) + offsets.top --+ self.menuBarOffset
   self.frame.h = (self.max.h * self.size.h / 100) - offsets.top - offsets.bottom
 
   self.win:setFrame(self.frame)
@@ -222,14 +227,15 @@ end
 function PaulWindowManager:moveWindowtoNextScreen()
   self.log.vf("creating a function for moving a window to the next screen")
   return function()
-    self.log.df("moving a window to the next screen")
     local win = hs.window.focusedWindow()
     local scr = win:screen()
     local nextScreen = scr:next()
-    win:moveToScreen(scr:next())
+    self.log.df("moving window" .. win:id() .. " to screen, " .. nextScreen:name())
+    self.max = nextScreen:frame()
+    win:moveToScreen(nextScreen)
     if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
       -- next screen is smaller; make it full screen.
-      local pwm = PaulWindowManager:new(win)
+      local pwm = PaulWindowManager:new(win, false, nextScreen)
       pwm.size = { h = 100, w = 100, x = 0, y = 0 }
       pwm:move()
     end
