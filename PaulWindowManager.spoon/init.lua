@@ -132,7 +132,7 @@ function PaulWindowManager:move()
 
   self.frame.x = self.max.x + (self.max.w * self.size.x / 100) + offsets.left
   self.frame.w = (self.max.w * self.size.w / 100) - offsets.left - offsets.right
-  self.frame.y = self.max.y + (self.max.h * self.size.y / 100) + offsets.top --+ self.menuBarOffset
+  self.frame.y = self.max.y + (self.max.h * self.size.y / 100) + offsets.top
   self.frame.h = (self.max.h * self.size.h / 100) - offsets.top - offsets.bottom
 
   self.win:setFrame(self.frame)
