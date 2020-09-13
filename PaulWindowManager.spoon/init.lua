@@ -135,6 +135,7 @@ function PaulWindowManager:move()
   self.frame.y = self.max.y + (self.max.h * self.size.y / 100) + offsets.top
   self.frame.h = (self.max.h * self.size.h / 100) - offsets.top - offsets.bottom
 
+  self.log.df("moving frame to x: %s y: %s h: %s w: %s", self.frame.x, self.frame.y, self.frame.h, self.frame.w)
   self.win:setFrame(self.frame)
 end
 
@@ -232,13 +233,13 @@ function PaulWindowManager:moveWindowtoNextScreen()
     local nextScreen = scr:next()
     self.log.df("moving window" .. win:id() .. " to screen, " .. nextScreen:name())
     self.max = nextScreen:frame()
+    pwm = PaulWindowManager:new(win, false, nextScreen)
     win:moveToScreen(nextScreen)
     if nextScreen:fullFrame().h < scr:fullFrame().h or nextScreen:fullFrame().w < scr:fullFrame().w then
       -- next screen is smaller; make it full screen.
-      local pwm = PaulWindowManager:new(win, false, nextScreen)
       pwm.size = { h = 100, w = 100, x = 0, y = 0 }
-      pwm:move()
     end
+    pwm:move()
   end
 end
 
