@@ -9,6 +9,7 @@ PaulWindowManager.author = "Paul Krohn <pkrohn@daemonize.com>"
 PaulWindowManager.license = "MIT - https://opensource.org/licenses/MIT"
 
 PaulWindowManager.log = hs.logger.new('pwm', 'debug')
+PaulWindowManager.margin = 10
 
 function PaulWindowManager:init()
   print("Initializing Paul's Window Manager")
@@ -19,8 +20,6 @@ function PaulWindowManager:new(win, useCurrentSize, screen)
   local self = setmetatable({}, PaulWindowManager)
 
   self.size = {x = 0, y = 0, h = 100, w = 100}
-
-  self.margin = 10
 
   self.win = win
   self.frame = win:frame()
